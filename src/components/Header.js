@@ -13,8 +13,11 @@ const Header = () => {
       {/* Sidebar Header */}
       <div className="bg-orange-100 text-red-950 p-4 flex justify-between items-center">
         <div className='flex'><img className='h-10 mr-4 ' src={logo} />
-          <h1 className="text-2xl font-bold kanit-regular hidden lg:visible">LevelLifeUP</h1></div>
-        <div>XP:12/32</div>
+          <h1 className="text-2xl font-bold kanit-regular hidden lg:flex">LevelLifeUP</h1></div>
+        <div className='flex'>
+          <div className='border-4 border-amber-500 text-[#FFEBDD] rounded-full mr-4 min-w-24 overflow-hidden'><div className='w-[70%] h-full bg-amber-500 text-red-950 text-center flex items-center'>HP</div></div>
+          <div className='bg-red-950 text-[#FFEBDD] px-4 py-2 rounded-full min-w-24 text-center'>XP:12/32</div>
+        </div>
         <button
           className="block lg:hidden p-2 rounded-md hover:bg-white focus:outline-none"
           onClick={toggleSidebar}
@@ -38,8 +41,7 @@ const Header = () => {
       {/* Sidebar Content */}
       <div className='flex'>
         <div
-          className={`${isOpen ? 'block' : 'hidden'
-            } lg:block bg-[#393434] text-white w-full lg:w-64 h-auto lg:h-[100vh] space-y-6 px-2 py-4 lg:py-8 lg:px-6 transition-transform transform lg:translate-x-0 
+          className={`${isOpen ? 'block' : 'hidden'} sidebar lg:block  text-white w-full lg:w-64 h-auto lg:h-[100vh] space-y-6 px-2 py-4 lg:py-8 lg:px-6 transition-transform transform lg:translate-x-0 
           ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative absolute top-16 left-0  lg:inset-0 z-20 lg:z-auto`}
         >
           <nav className="space-y-4">
@@ -60,7 +62,7 @@ const Header = () => {
             </a>
           </nav>
         </div>
-        <div className='text-white p-4 w-full'>
+        <div className='text-white w-full'>
           <Profile />
         </div>
       </div>
