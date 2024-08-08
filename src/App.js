@@ -1,10 +1,17 @@
-import logo from './images/Logo.png';
 import './App.css';
-import Header from './components/Header';
+import Profile from './pages/Profile';
+import Tasks from './pages/Tasks';
+import { BrowserRouter, Route, Routes} from 'react-router-dom';
+
 function App() {
   return (
     <div className="App">
-      <Header />
+      <BrowserRouter basename={process.env.PUBLIC_URL}>
+        <Routes>
+          <Route path="/" element={<Profile />} />
+          <Route path="/tasks" element={<Tasks />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }

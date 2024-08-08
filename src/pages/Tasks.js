@@ -1,7 +1,18 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import logo from '../images/Logo.png'
-import Profile from '../pages/Profile';
-const Header = () => {
+import TaskCard from '../components/TaskCard';
+const Tasks = () => {
+  const [tasks, setTasks] = useState([
+    { id: 1, title: 'Morning Run', description: 'Run 5km in the morning', category: 'Health', points:"20" },
+    { id: 2, title: 'Finish Project', description: 'Complete the frontend project', category: 'Work' ,points:"30"},
+    { id: 3, title: 'Read a Book', description: 'Read 50 pages of a book', category: 'Hobbies', points:"10"},
+    // Add more tasks here...
+  ]);
+
+  const handleComplete = (taskId) => {
+    setTasks(tasks.filter(task => task.id !== taskId));
+  };
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -12,7 +23,7 @@ const Header = () => {
     <div className="flex flex-col kanit-regular bg-[#282424]">
       {/* Sidebar Header */}
       <div className="bg-orange-100 text-red-950 p-4 flex justify-between items-center">
-        <div className='flex'><img className='h-10 mr-4 ' src={logo} />
+        <div className='flex'><img className='h-10 mr-4 ' src={logo} alt='logo' />
           <h1 className="text-2xl font-bold kanit-regular hidden lg:flex">LevelLifeUP</h1></div>
         <div className='flex'>
           <div className='border-4 border-amber-500 text-[#FFEBDD] rounded-full mr-4 min-w-24 overflow-hidden'><div className='w-[70%] h-full bg-amber-500 text-red-950 text-center flex items-center'>HP</div></div>
@@ -42,32 +53,27 @@ const Header = () => {
       <div className='flex'>
         <div
           className={`${isOpen ? 'block' : 'hidden'} sidebar lg:block  text-white w-full lg:w-64 h-auto lg:h-[100vh] space-y-6 px-2 py-4 lg:py-8 lg:px-6 transition-transform transform lg:translate-x-0 
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative absolute top-16 left-0  lg:inset-0 z-20 lg:z-auto`}
-        >
-          <nav className="space-y-4">
-            <a href="#" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-red-950">
-              Dashboard
-            </a>
-            <a href="#" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600  duration-200 hover:bg-red-900">
-              Tasks
-            </a>
-            <a href="#" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-orange-800">
-              Achievements
-            </a>
-            <a href="#" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-orange-900">
-              Rewards
-            </a>
-            <a href="#" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-orange-950">
-              Profile
-            </a>
-          </nav>
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative absolute top-16 left-0  lg:inset-0 z-20 lg:z-auto`}>
+          <div className="space-y-4 flex flex-col">
+            <Link to="/" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-red-950">Profile</Link>
+            <Link to="/tasks" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-orange-800">Tasks</Link>
+          </div>
         </div>
-        <div className='text-white w-full'>
-          <Profile />
+
+
+        <div className="p-6 lg:p-10 text-white">
+          <h2 className="text-2xl font-bold mb-6">Tasks</h2>
+          <div className="flex flex-wrap">
+            {tasks.map(task => (
+              <TaskCard key={task.id} task={task} onComplete={handleComplete} />
+            ))}
+          </div>
         </div>
+
+
       </div>
     </div>
   );
 };
 
-export default Header;
+export default Tasks;
