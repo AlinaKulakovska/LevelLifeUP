@@ -1,12 +1,27 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import logo from '../images/Logo.png'
 import { FaChevronDown } from 'react-icons/fa';
 import TaskCard from '../components/TaskCard';
 import TaskForm from '../components/TaskForm';
 
+import React, { useState,useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import AuthPopup from '../components/AuthPopup';
+import { auth } from '../firebase';
+import { onAuthStateChanged } from "firebase/auth"; 
 
 const Tasks = () => {
+  const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const openAuthPopup = () => setIsAuthPopupOpen(true);
+  const closeAuthPopup = () => setIsAuthPopupOpen(false);
+  
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const [tasks, setTasks] = useState([
     { id: 1, title: 'Morning Run', description: 'Run 5km in the morning', category: 'Health', points: "20" },
     { id: 2, title: 'Finish Project', description: 'Complete the frontend project', category: 'Work', points: "30" },
@@ -60,7 +75,13 @@ const Tasks = () => {
           <h1 className="text-2xl font-bold kanit-regular hidden lg:flex">LevelLifeUP</h1></div>
         <div className='flex'>
           <div className='border-4 border-amber-500 text-[#FFEBDD] rounded-full mr-4 min-w-24 overflow-hidden'><div className='w-[70%] h-full bg-amber-500 text-red-950 text-center flex items-center'>HP</div></div>
-          <div className='bg-red-950 text-[#FFEBDD] px-4 py-2 rounded-full min-w-24 text-center'>XP:12/32</div>
+          <div className='bg-red-950 text-[#FFEBDD] px-4 py-2 rounded-full min-w-24 text-center'>XP:12</div>
+          {user? "" : <button
+          onClick={openAuthPopup}
+          className="text-neutral-700 px-2 py-1 mx-4 text-sm rounded hover:text-white"
+        >
+          Sign In
+        </button>} 
         </div>
         <button
           className="block lg:hidden p-2 rounded-md hover:bg-white focus:outline-none"
@@ -94,6 +115,8 @@ const Tasks = () => {
         </div>
         <div className='flex flex-col mt-8'>
 
+        {isAuthPopupOpen && <AuthPopup onClose={closeAuthPopup} />}
+
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 text-white kanit-regular">
             {categories.map((category) => (
               <div key={category}>
@@ -118,7 +141,7 @@ const Tasks = () => {
             </div>
           </div>
 
-          <div className='flex justify-between mx-4'>
+          <div className='flex justify-between mx-4 my-8'>
             <div className='w-1/2'>  
               <h2 className='text-white text-2xl kanit-bold ml-6 flex items-center' onClick={togglehabitForm}>Add Habits <FaChevronDown className='ml-4' /></h2>
                 {ishabitFormOpen && (

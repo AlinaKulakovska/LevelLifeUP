@@ -3,18 +3,32 @@ import badge1 from '../images/badge.png';
 import RadarChart from '../components/RadarChart';
 import Rewards from '../components/Rewards';
 import logo from '../images/Logo.png'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import AuthPopup from '../components/AuthPopup';
+import { auth } from '../firebase';
+import { onAuthStateChanged } from "firebase/auth"; 
 
 const Profile = () => {
+  const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  
+  const openAuthPopup = () => setIsAuthPopupOpen(true);
+  const closeAuthPopup = () => setIsAuthPopupOpen(false);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
 
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
-
-  const user = {
+  
+  const userinfo = {
     name: 'John Doe',
     email: 'Newbie',
     level: 5,
@@ -25,6 +39,7 @@ const Profile = () => {
     statistics: [60, 70, 80, 50, 40], // Hobbies, Friends, Work, Self-care, Love
   };
 
+
   return (
     <div className="flex flex-col kanit-regular bg-[#282424]">
       {/* Sidebar Header */}
@@ -32,8 +47,14 @@ const Profile = () => {
         <div className='flex'><img className='h-10 mr-4 ' src={logo} alt='logo' />
           <h1 className="text-2xl font-bold kanit-regular hidden lg:flex">LevelLifeUP</h1></div>
         <div className='flex'>
-          <div className='border-4 border-amber-500 text-[#FFEBDD] rounded-full mr-4 min-w-24 overflow-hidden'><div className='w-[70%] h-full bg-amber-500 text-red-950 text-center flex items-center'>HP</div></div>
-          <div className='bg-red-950 text-[#FFEBDD] px-4 py-2 rounded-full min-w-24 text-center'>XP:12/32</div>
+          <div className='border-4 border-amber-500 text-[#FFEBDD] rounded-full mr-4 min-w-12 md:min-w-24 overflow-hidden'><div className='w-[70%] h-full bg-amber-500 text-red-950 text-center flex items-center'>HP</div></div>
+          <div className='bg-red-950 text-[#FFEBDD] px-4 py-2 rounded-full min-w-12 md:min-w-24  text-center'>XP:12</div>
+         {user? "" : <button
+          onClick={openAuthPopup}
+          className="text-neutral-700 px-2 py-1 mx-4 text-sm rounded hover:text-white"
+        >
+          Sign In
+        </button>} 
         </div>
         <button
           className="block lg:hidden p-2 rounded-md hover:bg-white focus:outline-none"
@@ -66,6 +87,8 @@ const Profile = () => {
           </div>
         </div>
 
+        {isAuthPopupOpen && <AuthPopup onClose={closeAuthPopup} />}
+
         <div className="rounded-lg overflow-hidden text-white w-full">
           <div className="flex items-center p-6 bg-neutral-950 text-white pattern">
             <img
@@ -74,8 +97,8 @@ const Profile = () => {
               alt="User"
             />
             <div>
-              <h1 className="text-2xl font-bold">{user.name}</h1>
-              <p className='text-neutral-200'>{user.email}</p>
+              <h1 className="text-2xl font-bold">{userinfo.name}</h1>
+              <p className='text-neutral-200'>{userinfo.email}</p>
             </div>
           </div>
           <div className="p-6">
@@ -83,29 +106,29 @@ const Profile = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-[#393434] p-4 rounded-lg">
                 <h3 className="font-bold">Level</h3>
-                <p>{user.level}</p>
+                <p>{userinfo.level}</p>
               </div>
               <div className="bg-[#393434] p-4 rounded-lg">
                 <h3 className="font-bold">Level</h3>
-                <p>{user.level}</p>
+                <p>{userinfo.level}</p>
               </div>
               <div className="bg-[#393434] p-4 rounded-lg">
                 <h3 className="font-bold">Points</h3>
-                <p>{user.points}</p>
+                <p>{userinfo.points}</p>
               </div>
               <div className="bg-[#393434] p-4 rounded-lg">
                 <h3 className="font-bold">Tasks Completed</h3>
-                <p>{user.tasksCompleted}</p>
+                <p>{userinfo.tasksCompleted}</p>
               </div>
             </div>
             <div className='flex flex-wrap'>
-              <RadarChart userData={user.statistics} />
+              <RadarChart userData={userinfo.statistics} />
 
               <div>
                 <div>
                   <h2 className="text-xl font-bold mt-6 mb-4">Achievements</h2>
                   <ul className="list-disc list-inside  p-4 rounded-lg">
-                    {user.achievements.map((achievement, index) => (
+                    {userinfo.achievements.map((achievement, index) => (
                       <li key={index}>{achievement}</li>
                     ))}
                   </ul>
@@ -113,7 +136,7 @@ const Profile = () => {
                 <div>
                   <h2 className="text-xl font-bold mt-6 mb-4">Badges</h2>
                   <div className="flex space-x-4">
-                    {user.badges.map((badge, index) => (
+                    {userinfo.badges.map((badge, index) => (
                       <div className='flex flex-col items-center'>
                         <img key={index} className="w-12 h-12 " src={badge} alt={`Badge ${index + 1}`} />
                         <p className='text-center font-thin'>badge name</p>
