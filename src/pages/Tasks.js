@@ -1,17 +1,26 @@
 import { FaChevronDown } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+
 import TaskCard from '../components/TaskCard';
 import TaskForm from '../components/TaskForm';
 import SidebarHeader from '../components/SidebarHeader';
 import Sidebar from '../components/Sidebar';
-import React, { useState, useEffect } from 'react';
 import AuthPopup from '../components/AuthPopup';
-import { auth } from '../firebase';
-import { onAuthStateChanged } from "firebase/auth";
-import { signOut } from "firebase/auth";
 
+import { onAuthStateChanged, signOut} from "firebase/auth";
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { auth, db } from "../firebase";
 const Tasks = () => {
   const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
-  const [userlogined, setUserlogined] = useState(false);
+  const [userlogined, setUserlogined] = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [habits, setHabits] = useState([]);
+  const categories = ['Health', 'Work', 'Hobbies', 'Self-care', 'Friends'];
+  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
+  const [ishabitFormOpen, setIshabitFormOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
   const openAuthPopup = () => setIsAuthPopupOpen(true);
   const closeAuthPopup = () => setIsAuthPopupOpen(false);
 
@@ -26,56 +35,137 @@ const Tasks = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUserlogined(true)
+      setUserlogined(user);
     });
     return () => unsubscribe();
   }, []);
 
-  const [tasks, setTasks] = useState([
-    { id: 1, title: 'Morning Run', description: 'Run 5km in the morning', category: 'Health', points: "20" },
-    { id: 2, title: 'Finish Project', description: 'Complete the frontend project', category: 'Work', points: "30" },
-    { id: 3, title: 'Read a Book', description: 'Read 50 pages of a book', category: 'Hobbies', points: "10" },
-    { id: 4, title: 'Meditation', description: '15 minutes of meditation', category: 'Self-care', points: 5 },
-    { id: 5, title: 'Call a Friend', description: 'Catch up with a friend', category: 'Friends', points: 8 },
-    // Add more tasks here...
-  ]);
-  const categories = ['Health', 'Work', 'Hobbies', 'Self-care', 'Friends'];
-  const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
-  const [ishabitFormOpen, setIshabitFormOpen] = useState(false);
+  useEffect(() => {
+    const fetchUserData = async (user) => {
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
 
-  const [habits, setHabits] = useState([
-    { id: 1, title: 'Drink Water', description: 'Drink 8 glasses of water', xp: 5 },
-    { id: 2, title: 'Daily Exercise', description: '30 minutes of exercise', xp: 10 },
-    // Add more habits here
-  ]);
-  const handleHabitComplete = (habitId) => {
-    // Update state or perform any action needed when habit is completed
-    const habit = habits.find(habit => habit.id === habitId);
-    console.log(`Habit completed: ${habit.title}, XP: ${habit.xp}`);
-    // You could also update the user's XP here
-  };
-  const handleAddHabit = (newHabit) => {
-    setHabits([...habits, { ...newHabit, id: habits.length + 1 }]);
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          setUserInfo(userData);
+          setTasks(userData.tasks || []);
+          setHabits(userData.habits || []);
+        } else {
+          console.log('No such document!');
+        }
+      } else {
+        console.log('User is not signed in');
+        setUserInfo(null);
+      }
+    };
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUserlogined(user);
+      fetchUserData(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handleAddTask = async (newTask) => {
+    const updatedTasks = [...tasks, { ...newTask, id: tasks.length + 1 }];
+    setTasks(updatedTasks);
+
+    if (userlogined) {
+      try {
+        const userDocRef = doc(db, 'users', userlogined.uid);
+        await updateDoc(userDocRef, {
+          tasks: arrayUnion({ ...newTask, id: tasks.length + 1 }),
+        });
+      } catch (error) {
+        console.error("Error adding task: ", error);
+      }
+    }
   };
 
-  const handleComplete = (taskId) => {
-    setTasks(tasks.filter(task => task.id !== taskId));
+  const handleComplete = async (taskId) => {
+    const completedTask = tasks.find(task => task.id === taskId);
+    const updatedTasks = tasks.filter(task => task.id !== taskId);
+    setTasks(updatedTasks);
+  
+    if (userlogined && completedTask) {
+      const updatedPoints = (userInfo.points || 0) + Number(completedTask.xp);
+      const categories = ['Health', 'Work', 'Hobbies', 'Self-care', 'Friends'];
+      const categoryIndex = categories.indexOf(completedTask.category);
+  
+      let updatedStats = [...(userInfo.statistics || [0, 0, 0, 0, 0])];
+      if (categoryIndex !== -1) {
+        updatedStats[categoryIndex] += 1;
+      }
+  
+      try {
+        const userDocRef = doc(db, 'users', userlogined.uid);
+        await updateDoc(userDocRef, {
+          tasks: arrayRemove(completedTask),
+          points: updatedPoints,
+          tasksCompleted: (userInfo.tasksCompleted || 0) + 1,
+          statistics: updatedStats,
+        });
+  
+        setUserInfo((prev) => ({
+          ...prev,
+          points: updatedPoints,
+          tasksCompleted: (userInfo.tasksCompleted || 0) + 1,
+          statistics: updatedStats,
+        }));
+      } catch (error) {
+        console.error("Error completing task: ", error);
+      }
+    }
   };
-  const [isOpen, setIsOpen] = useState(false);
+  
 
-  const handleAddTask = (newTask) => {
-    setTasks([...tasks, { ...newTask, id: tasks.length + 1 }]);
+  const handleAddHabit = async (newHabit) => {
+    const updatedHabits = [...habits, { ...newHabit, id: habits.length + 1 }];
+    setHabits(updatedHabits);
+
+    if (userlogined) {
+      try {
+        const userDocRef = doc(db, 'users', userlogined.uid);
+        await updateDoc(userDocRef, {
+          habits: arrayUnion({ ...newHabit, id: habits.length + 1 }),
+        });
+      } catch (error) {
+        console.error("Error adding habit: ", error);
+      }
+    }
+  };
+
+  const handleHabitComplete = async (habitId) => {
+    const completedHabit = habits.find(habit => habit.id === habitId);
+    if (userlogined && completedHabit) {
+      const updatedPoints = (userInfo.points || 0) + Number(completedHabit.xp);
+      try {
+        const userDocRef = doc(db, 'users', userlogined.uid);
+        await updateDoc(userDocRef, {
+          points: updatedPoints,
+        });
+        setUserInfo((prev) => ({ ...prev, points: updatedPoints }));
+        console.log(`Habit completed: ${completedHabit.title}, XP: ${completedHabit.xp}`);
+      } catch (error) {
+        console.error("Error completing habit: ", error);
+      }
+    }
   };
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
+
   const toggleTaskForm = () => {
     setIsTaskFormOpen(!isTaskFormOpen);
   };
+
   const togglehabitForm = () => {
     setIshabitFormOpen(!ishabitFormOpen);
   };
+
   return (
     <div className="flex flex-col kanit-regular bg-[#282424]">
       {isAuthPopupOpen && <AuthPopup onClose={closeAuthPopup} />}
@@ -84,6 +174,7 @@ const Tasks = () => {
         signOutUser={signOutUser}
         openAuthPopup={openAuthPopup}
         toggleSidebar={toggleSidebar}
+        points={userInfo ? userInfo.points : ""}
       />
       <div className='flex'>
         <Sidebar isOpen={isOpen} />

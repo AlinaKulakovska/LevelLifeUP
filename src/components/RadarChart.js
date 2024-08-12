@@ -6,7 +6,7 @@ ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, 
 
 const RadarChart = ({ userData }) => {
   const data = {
-    labels: ['Hobbies', 'Social', 'Work', 'Self-care', 'Love'],
+    labels: ['Health', 'Work', 'Hobbies', 'Self-care', 'Friends'],
     datasets: [
       {
         label: 'User Data',
@@ -25,7 +25,7 @@ const RadarChart = ({ userData }) => {
           display: true,
         },
         suggestedMin: 0,
-        suggestedMax: 100,
+        suggestedMax: 10,
       },
     },
     plugins: {

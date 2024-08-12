@@ -25,6 +25,7 @@ const Profile = () => {
       if (user) {
         const userDocRef = doc(db, 'users', user.uid);
         const userDocSnap = await getDoc(userDocRef);
+
         setUserlogined(user);
         if (userDocSnap.exists()) {
           setUserInfo(userDocSnap.data());
@@ -63,6 +64,7 @@ const Profile = () => {
         signOutUser={signOutUser} 
         openAuthPopup={openAuthPopup} 
         toggleSidebar={toggleSidebar} 
+        points={userInfo ? userInfo.points : ""}
       />
       <div className='flex'>
         <Sidebar isOpen={isOpen} />
@@ -117,7 +119,7 @@ const Profile = () => {
             </div>
             <div>
               {/* get from firebase */}
-              <Rewards />
+              <Rewards userId={userlogined.uid}/>
             </div>
           </div>
         </div>

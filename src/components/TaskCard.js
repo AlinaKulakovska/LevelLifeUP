@@ -8,7 +8,7 @@ const TaskCard = ({ task, onComplete }) => {
             <div>
                 <h3 className="text-lg font-semibold">{task.title}</h3>
                 <p className="text-sm">{task.description}</p>
-                <p className="text-sm">XP: {task.points}</p>
+                <p className="text-sm">XP: {task.xp}</p>
             </div>
             <div>
                 <button

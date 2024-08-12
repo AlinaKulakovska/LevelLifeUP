@@ -1,40 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
+import { doc, updateDoc, getDoc } from "firebase/firestore";
+import { db } from "../firebase"; // Ensure this points to your Firebase configuration
 
-const Rewards = () => {
-  const [rewards, setRewards] = useState([{ id: 1, title: 'Gift Card', points: 50 },
-    { id: 2, title: 'Extra Day Off', points: 100}]);
+const Rewards = ({ userId }) => {
+  const [rewards, setRewards] = useState([]);
   const [newReward, setNewReward] = useState({ title: '', points: '' });
-  const [addRewardOpen, setAddRewardOpen] = useState(false)
+  const [addRewardOpen, setAddRewardOpen] = useState(false);
+  const [userPoints, setUserPoints] = useState(0);
+
+  useEffect(() => {
+    // Fetch rewards and user points from Firestore
+    const fetchUserRewards = async () => {
+      const userDocRef = doc(db, 'users', userId);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data();
+        setRewards(userData.rewards || []);
+        setUserPoints(userData.points || 0);
+      }
+    };
+
+    fetchUserRewards();
+  }, [userId]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewReward({ ...newReward, [name]: value });
   };
 
-  const handleAddReward = (e) => {
+  const handleAddReward = async (e) => {
     e.preventDefault();
     if (newReward.title && newReward.points) {
-      setRewards([
+      const updatedRewards = [
         ...rewards,
         { id: rewards.length + 1, title: newReward.title, points: Number(newReward.points) },
+      ];
+      setRewards(updatedRewards);
 
+      // Update Firestore with the new rewards
+      const userDocRef = doc(db, 'users', userId);
+      await updateDoc(userDocRef, { rewards: updatedRewards });
 
-// connect to firebase
-
-
-      ]);
       setNewReward({ title: '', points: '' });
     }
   };
 
-  const handlePurchase = (points) => {
-    alert(`Purchased for ${points} points!`);
+  const handlePurchase = async (points, rewardId) => {
+    if (userPoints >= points) {
+      const remainingRewards = rewards.filter((reward) => reward.id !== rewardId);
+      const updatedPoints = userPoints - points;
 
+      setRewards(remainingRewards);
+      setUserPoints(updatedPoints);
 
-    // Implement point deduction logic here
+      // Update Firestore with the new rewards and points
+      const userDocRef = doc(db, 'users', userId);
+      await updateDoc(userDocRef, {
+        rewards: remainingRewards,
+        points: updatedPoints,
+      });
 
-
-
+      alert(`Purchased for ${points} points!`);
+    } else {
+      alert('Not enough points to purchase this reward.');
+    }
   };
 
   return (
@@ -47,7 +78,7 @@ const Rewards = () => {
             <p className="mb-4">Points: {reward.points}</p>
             <button
               className="bg-amber-500 py-2 px-4 rounded hover:bg-amber-600"
-              onClick={() => handlePurchase(reward.points)}
+              onClick={() => handlePurchase(reward.points, reward.id)}
             >
               Purchase
             </button>
@@ -55,7 +86,10 @@ const Rewards = () => {
         ))}
       </div>
       <div className="mt-10">
-        <h2 className="text-2xl font-bold mb-4 flex items-center"    onClick={() => setAddRewardOpen(!addRewardOpen)} >Add New Reward<FaChevronDown className='ml-4' /></h2>
+        <h2 className="text-2xl font-bold mb-4 flex items-center" onClick={() => setAddRewardOpen(!addRewardOpen)}>
+          Add New Reward
+          <FaChevronDown className="ml-4" />
+        </h2>
         <div className={addRewardOpen ? 'block' : 'hidden'}>
           <form onSubmit={handleAddReward} className="bg-[#393434] shadow-md rounded-lg p-6">
             <div className="mb-4">
@@ -72,7 +106,7 @@ const Rewards = () => {
               />
             </div>
             <div className="mb-4">
-              <label className="block  text-sm font-bold mb-2" htmlFor="points">
+              <label className="block text-sm font-bold mb-2" htmlFor="points">
                 Points Required
               </label>
               <input

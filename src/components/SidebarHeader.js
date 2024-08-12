@@ -2,7 +2,7 @@
 import React from 'react';
 import logo from '../images/Logo.png';
 
-const SidebarHeader = ({ userlogined, signOutUser, openAuthPopup, toggleSidebar }) => {
+const SidebarHeader = ({ userlogined, signOutUser, openAuthPopup, toggleSidebar, points }) => {
   return (
     <div className="bg-orange-100 text-red-950 p-4 flex justify-between items-center">
       <div className='flex'>
@@ -10,10 +10,10 @@ const SidebarHeader = ({ userlogined, signOutUser, openAuthPopup, toggleSidebar 
         <h1 className="text-2xl font-bold kanit-regular hidden lg:flex">LevelLifeUP</h1>
       </div>
       <div className='flex'>
-        <div className='border-4 border-amber-500 text-[#FFEBDD] rounded-full mr-4 min-w-12 md:min-w-24 overflow-hidden'>
+        {/* <div className='border-4 border-amber-500 text-[#FFEBDD] rounded-full mr-4 min-w-12 md:min-w-24 overflow-hidden'>
           <div className='w-[70%] h-full bg-amber-500 text-red-950 text-center flex items-center'>HP</div>
-        </div>
-        <div className='bg-red-950 text-[#FFEBDD] px-4 py-2 rounded-full min-w-12 md:min-w-24 text-center'>XP:12</div>
+        </div> */}
+        <div className='bg-red-950 text-[#FFEBDD] px-4 py-2 rounded-full min-w-12 md:min-w-24 text-center'>XP:{points}</div>
         {userlogined ? (
           <button
             onClick={signOutUser}
