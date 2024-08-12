@@ -1,94 +1,71 @@
+import React, { useState, useEffect } from 'react';
 import userPhoto from '../images/user-avatar.jpg';
-import badge1 from '../images/badge.png';
 import RadarChart from '../components/RadarChart';
 import Rewards from '../components/Rewards';
-import logo from '../images/Logo.png'
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import AuthPopup from '../components/AuthPopup';
-import { auth } from '../firebase';
-import { onAuthStateChanged } from "firebase/auth"; 
+import SidebarHeader from '../components/SidebarHeader';
+import Sidebar from '../components/Sidebar';
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 const Profile = () => {
   const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  
+  const [userlogined, setUserlogined] = useState(null);
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+
   const openAuthPopup = () => setIsAuthPopupOpen(true);
   const closeAuthPopup = () => setIsAuthPopupOpen(false);
+  const toggleSidebar = () => setIsOpen(!isOpen);
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        setUserlogined(user);
+        if (userDocSnap.exists()) {
+          setUserInfo(userDocSnap.data());
+        } else {
+          console.log('No such document!');
+        }
+      } else {
+        console.log('User is not signed in');
+        setUserInfo(null);
+      }
+      setLoading(false);
     });
+
     return () => unsubscribe();
   }, []);
 
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-  
-  const userinfo = {
-    name: 'John Doe',
-    email: 'Newbie',
-    level: 5,
-    points: 120,
-    tasksCompleted: 45,
-    achievements: ['First Task Completed', 'Level 5 Achieved'],
-    badges: [badge1, badge1], // Add paths to badge images
-    statistics: [60, 70, 80, 50, 40], // Hobbies, Friends, Work, Self-care, Love
+  const signOutUser = async () => {
+    try {
+      await signOut(auth);
+      console.log("User signed out successfully");
+      setUserlogined(null);
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="flex flex-col kanit-regular bg-[#282424]">
-      {/* Sidebar Header */}
-      <div className="bg-orange-100 text-red-950 p-4 flex justify-between items-center">
-        <div className='flex'><img className='h-10 mr-4 ' src={logo} alt='logo' />
-          <h1 className="text-2xl font-bold kanit-regular hidden lg:flex">LevelLifeUP</h1></div>
-        <div className='flex'>
-          <div className='border-4 border-amber-500 text-[#FFEBDD] rounded-full mr-4 min-w-12 md:min-w-24 overflow-hidden'><div className='w-[70%] h-full bg-amber-500 text-red-950 text-center flex items-center'>HP</div></div>
-          <div className='bg-red-950 text-[#FFEBDD] px-4 py-2 rounded-full min-w-12 md:min-w-24  text-center'>XP:12</div>
-         {user? "" : <button
-          onClick={openAuthPopup}
-          className="text-neutral-700 px-2 py-1 mx-4 text-sm rounded hover:text-white"
-        >
-          Sign In
-        </button>} 
-        </div>
-        <button
-          className="block lg:hidden p-2 rounded-md hover:bg-white focus:outline-none"
-          onClick={toggleSidebar}
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            ></path>
-          </svg>
-        </button>
-      </div>
-      {/* Sidebar Content */}
+    <div className="kanit-regular bg-[#282424]">
+      {isAuthPopupOpen && <AuthPopup onClose={closeAuthPopup} />}
+      <SidebarHeader 
+        userlogined={userlogined} 
+        signOutUser={signOutUser} 
+        openAuthPopup={openAuthPopup} 
+        toggleSidebar={toggleSidebar} 
+      />
       <div className='flex'>
-        <div
-          className={`${isOpen ? 'block' : 'hidden'} sidebar lg:block  text-white w-full lg:w-64 h-auto lg:h-[100vh] space-y-6 px-2 py-4 lg:py-8 lg:px-6 transition-transform transform lg:translate-x-0 
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative absolute top-16 left-0  lg:inset-0 z-20 lg:z-auto`}>
-          <div className="space-y-4 flex flex-col">
-            <Link to="/" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-red-950">Profile</Link>
-            <Link to="/tasks" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-orange-800">Tasks</Link>
-          </div>
-        </div>
-
-        {isAuthPopupOpen && <AuthPopup onClose={closeAuthPopup} />}
-
+        <Sidebar isOpen={isOpen} />
         <div className="rounded-lg overflow-hidden text-white w-full">
           <div className="flex items-center p-6 bg-neutral-950 text-white pattern">
             <img
@@ -97,8 +74,8 @@ const Profile = () => {
               alt="User"
             />
             <div>
-              <h1 className="text-2xl font-bold">{userinfo.name}</h1>
-              <p className='text-neutral-200'>{userinfo.email}</p>
+              <h1 className="text-2xl font-bold">{userInfo?.name || 'User Name'}</h1>
+              <p className='text-neutral-200'>{userInfo?.email || 'User Email'}</p>
             </div>
           </div>
           <div className="p-6">
@@ -106,47 +83,40 @@ const Profile = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-[#393434] p-4 rounded-lg">
                 <h3 className="font-bold">Level</h3>
-                <p>{userinfo.level}</p>
-              </div>
-              <div className="bg-[#393434] p-4 rounded-lg">
-                <h3 className="font-bold">Level</h3>
-                <p>{userinfo.level}</p>
+                <p>{userInfo?.level || 0}</p>
               </div>
               <div className="bg-[#393434] p-4 rounded-lg">
                 <h3 className="font-bold">Points</h3>
-                <p>{userinfo.points}</p>
+                <p>{userInfo?.points || 0}</p>
               </div>
               <div className="bg-[#393434] p-4 rounded-lg">
                 <h3 className="font-bold">Tasks Completed</h3>
-                <p>{userinfo.tasksCompleted}</p>
+                <p>{userInfo?.tasksCompleted || 0}</p>
               </div>
             </div>
             <div className='flex flex-wrap'>
-              <RadarChart userData={userinfo.statistics} />
-
+              <RadarChart userData={userInfo?.statistics || [0, 0, 0, 0, 0]} />
               <div>
                 <div>
                   <h2 className="text-xl font-bold mt-6 mb-4">Achievements</h2>
-                  <ul className="list-disc list-inside  p-4 rounded-lg">
-                    {userinfo.achievements.map((achievement, index) => (
+                  <ul className="list-disc list-inside p-4 rounded-lg">
+                    {userInfo?.achievements?.map((achievement, index) => (
                       <li key={index}>{achievement}</li>
-                    ))}
+                    )) || 'No Achievements'}
                   </ul>
                 </div>
                 <div>
                   <h2 className="text-xl font-bold mt-6 mb-4">Badges</h2>
                   <div className="flex space-x-4">
-                    {userinfo.badges.map((badge, index) => (
-                      <div className='flex flex-col items-center'>
-                        <img key={index} className="w-12 h-12 " src={badge} alt={`Badge ${index + 1}`} />
-                        <p className='text-center font-thin'>badge name</p>
-                      </div>
-                    ))}
+                    {userInfo?.badges?.map((badge, index) => (
+                      <img key={index} className="w-12 h-12" src={badge} alt={`Badge ${index + 1}`} />
+                    )) || 'No Badges'}
                   </div>
                 </div>
               </div>
             </div>
             <div>
+              {/* get from firebase */}
               <Rewards />
             </div>
           </div>

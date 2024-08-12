@@ -1,23 +1,32 @@
-import logo from '../images/Logo.png'
 import { FaChevronDown } from 'react-icons/fa';
 import TaskCard from '../components/TaskCard';
 import TaskForm from '../components/TaskForm';
-
-import React, { useState,useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import SidebarHeader from '../components/SidebarHeader';
+import Sidebar from '../components/Sidebar';
+import React, { useState, useEffect } from 'react';
 import AuthPopup from '../components/AuthPopup';
 import { auth } from '../firebase';
-import { onAuthStateChanged } from "firebase/auth"; 
+import { onAuthStateChanged } from "firebase/auth";
+import { signOut } from "firebase/auth";
 
 const Tasks = () => {
   const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const [userlogined, setUserlogined] = useState(false);
   const openAuthPopup = () => setIsAuthPopupOpen(true);
   const closeAuthPopup = () => setIsAuthPopupOpen(false);
-  
+
+  const signOutUser = async () => {
+    try {
+      await signOut(auth);
+      console.log("User signed out successfully");
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+      setUserlogined(true)
     });
     return () => unsubscribe();
   }, []);
@@ -69,54 +78,16 @@ const Tasks = () => {
   };
   return (
     <div className="flex flex-col kanit-regular bg-[#282424]">
-      {/* Sidebar Header */}
-      <div className="bg-orange-100 text-red-950 p-4 flex justify-between items-center">
-        <div className='flex'><img className='h-10 mr-4 ' src={logo} alt='logo' />
-          <h1 className="text-2xl font-bold kanit-regular hidden lg:flex">LevelLifeUP</h1></div>
-        <div className='flex'>
-          <div className='border-4 border-amber-500 text-[#FFEBDD] rounded-full mr-4 min-w-24 overflow-hidden'><div className='w-[70%] h-full bg-amber-500 text-red-950 text-center flex items-center'>HP</div></div>
-          <div className='bg-red-950 text-[#FFEBDD] px-4 py-2 rounded-full min-w-24 text-center'>XP:12</div>
-          {user? "" : <button
-          onClick={openAuthPopup}
-          className="text-neutral-700 px-2 py-1 mx-4 text-sm rounded hover:text-white"
-        >
-          Sign In
-        </button>} 
-        </div>
-        <button
-          className="block lg:hidden p-2 rounded-md hover:bg-white focus:outline-none"
-          onClick={toggleSidebar}
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M4 6h16M4 12h16M4 18h16"
-            ></path>
-          </svg>
-        </button>
-      </div>
-      {/* Sidebar Content */}
+      {isAuthPopupOpen && <AuthPopup onClose={closeAuthPopup} />}
+      <SidebarHeader
+        userlogined={userlogined}
+        signOutUser={signOutUser}
+        openAuthPopup={openAuthPopup}
+        toggleSidebar={toggleSidebar}
+      />
       <div className='flex'>
-        <div
-          className={`${isOpen ? 'block' : 'hidden'} sidebar lg:block  text-white w-full lg:w-64 h-auto lg:h-[100vh] space-y-6 px-2 py-4 lg:py-8 lg:px-6 transition-transform transform lg:translate-x-0 
-          ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative absolute top-16 left-0  lg:inset-0 z-20 lg:z-auto`}>
-          <div className="space-y-4 flex flex-col">
-            <Link to="/" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-red-950">Profile</Link>
-            <Link to="/tasks" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-orange-800">Tasks</Link>
-          </div>
-        </div>
+        <Sidebar isOpen={isOpen} />
         <div className='flex flex-col mt-8'>
-
-        {isAuthPopupOpen && <AuthPopup onClose={closeAuthPopup} />}
-
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 text-white kanit-regular">
             {categories.map((category) => (
               <div key={category}>
@@ -142,22 +113,21 @@ const Tasks = () => {
           </div>
 
           <div className='flex justify-between mx-4 my-8'>
-            <div className='w-1/2'>  
+            <div className='w-1/2'>
               <h2 className='text-white text-2xl kanit-bold ml-6 flex items-center' onClick={togglehabitForm}>Add Habits <FaChevronDown className='ml-4' /></h2>
-                {ishabitFormOpen && (
+              {ishabitFormOpen && (
                 <TaskForm onAddTask={handleAddHabit} />
               )}</div>
-              <div className='w-1/2'>  <h2 className='text-white text-2xl kanit-bold ml-6 flex items-center' onClick={toggleTaskForm}>Add Tasks <FaChevronDown className='ml-4' /></h2>
-                  {isTaskFormOpen && (
-                  <TaskForm onAddTask={handleAddTask} />
-                )}</div>
-              </div>
-
-
-            </div>
+            <div className='w-1/2'>  <h2 className='text-white text-2xl kanit-bold ml-6 flex items-center' onClick={toggleTaskForm}>Add Tasks <FaChevronDown className='ml-4' /></h2>
+              {isTaskFormOpen && (
+                <TaskForm onAddTask={handleAddTask} />
+              )}</div>
           </div>
+
         </div>
-        );
+      </div>
+    </div>
+  );
 };
 
-        export default Tasks;
+export default Tasks;

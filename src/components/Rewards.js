@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 
 const Rewards = () => {
-  const [rewards, setRewards] = useState([
-    { id: 1, title: 'Gift Card', points: 50 },
-    { id: 2, title: 'Extra Day Off', points: 100 },
-  ]);
+  const [rewards, setRewards] = useState([{ id: 1, title: 'Gift Card', points: 50 },
+    { id: 2, title: 'Extra Day Off', points: 100}]);
   const [newReward, setNewReward] = useState({ title: '', points: '' });
   const [addRewardOpen, setAddRewardOpen] = useState(false)
   const handleInputChange = (e) => {
@@ -19,6 +17,11 @@ const Rewards = () => {
       setRewards([
         ...rewards,
         { id: rewards.length + 1, title: newReward.title, points: Number(newReward.points) },
+
+
+// connect to firebase
+
+
       ]);
       setNewReward({ title: '', points: '' });
     }
@@ -26,7 +29,12 @@ const Rewards = () => {
 
   const handlePurchase = (points) => {
     alert(`Purchased for ${points} points!`);
+
+
     // Implement point deduction logic here
+
+
+
   };
 
   return (
