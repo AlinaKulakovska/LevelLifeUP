@@ -33,12 +33,12 @@ const Tasks = () => {
     }
   };
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUserlogined(user);
-    });
-    return () => unsubscribe();
-  }, []);
+  // useEffect(() => {
+  //   const unsubscribe = onAuthStateChanged(auth, (user) => {
+  //     setUserlogined(user);
+  //   });
+  //   return () => unsubscribe();
+  // }, []);
 
   useEffect(() => {
     const fetchUserData = async (user) => {
@@ -166,6 +166,42 @@ const Tasks = () => {
     setIshabitFormOpen(!ishabitFormOpen);
   };
 
+  const handleDeleteTask = async (taskId) => {
+    const taskToDelete = tasks.find(task => task.id === taskId);
+    const updatedTasks = tasks.filter(task => task.id !== taskId);
+    setTasks(updatedTasks);
+
+    if (userlogined && taskToDelete) {
+      try {
+        const userDocRef = doc(db, 'users', userlogined.uid);
+        await updateDoc(userDocRef, {
+          tasks: arrayRemove(taskToDelete),
+        });
+      } catch (error) {
+        console.error("Error deleting task: ", error);
+      }
+    }
+  };
+
+  const handleDeleteHabit = async (habitId) => {
+    const habitToDelete = habits.find(habit => habit.id === habitId);
+    const updatedHabits = habits.filter(habit => habit.id !== habitId);
+    setHabits(updatedHabits);
+
+    if (userlogined && habitToDelete) {
+      try {
+        const userDocRef = doc(db, 'users', userlogined.uid);
+        await updateDoc(userDocRef, {
+          habits: arrayRemove(habitToDelete),
+        });
+      } catch (error) {
+        console.error("Error deleting habit: ", error);
+      }
+    }
+  };
+
+  const sortedTasks = tasks.sort((a, b) => b.isUrgent - a.isUrgent); // Sort by urgency
+
   return (
     <div className="flex flex-col kanit-regular bg-[#282424]">
       {isAuthPopupOpen && <AuthPopup onClose={closeAuthPopup} />}
@@ -184,10 +220,10 @@ const Tasks = () => {
               <div key={category}>
                 <h2 className="text-xl font-semibold mb-2 text-center">{category}</h2>
                 <div className="space-y-4">
-                  {tasks
+                  {sortedTasks
                     .filter(task => task.category === category)
                     .map(task => (
-                      <TaskCard key={task.id} task={task} onComplete={handleComplete} />
+                      <TaskCard key={task.id} task={task} onComplete={handleComplete} onDelete={handleDeleteTask}/>
                     ))}
                 </div>
               </div>
@@ -198,7 +234,7 @@ const Tasks = () => {
             <h2 className="text-2xl font-semibold mb-4 ml-6 text-white">Your Habits</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {habits.map(habit => (
-                <TaskCard key={habit.id} task={habit} onComplete={handleHabitComplete} />
+                <TaskCard key={habit.id} task={habit} onComplete={handleHabitComplete}   onDelete={handleDeleteHabit} />
               ))}
             </div>
           </div>
@@ -209,7 +245,7 @@ const Tasks = () => {
               {ishabitFormOpen && (
                 <TaskForm onAddTask={handleAddHabit} />
               )}</div>
-            <div className='w-1/2'>  <h2 className='text-white text-2xl kanit-bold ml-6 flex items-center' onClick={toggleTaskForm}>Add Tasks <FaChevronDown className='ml-4' /></h2>
+            <div className='w-1/2'>  <h2 className='text-white text-2xl kanit-bold ml-6 flex items-center' onClick={toggleTaskForm}>Add Quest <FaChevronDown className='ml-4' /></h2>
               {isTaskFormOpen && (
                 <TaskForm onAddTask={handleAddTask} />
               )}</div>

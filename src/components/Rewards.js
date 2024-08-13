@@ -72,18 +72,25 @@ const Rewards = ({ userId }) => {
     <div className="p-4 lg:p-6">
       <h2 className="text-2xl font-bold mb-6">Rewards</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {rewards.map((reward) => (
-          <div key={reward.id} className="shadow-md rounded-lg p-6 bg-[#393434]">
-            <h3 className="text-xl font-bold mb-2">{reward.title}</h3>
-            <p className="mb-4">Points: {reward.points}</p>
-            <button
-              className="bg-amber-500 py-2 px-4 rounded hover:bg-amber-600"
-              onClick={() => handlePurchase(reward.points, reward.id)}
+        {rewards.map((reward) => {
+          const isAffordable = userPoints >= reward.points;
+          return (
+            <div 
+              key={reward.id} 
+              className="shadow-md rounded-lg p-6 bg-[#393434]"
             >
-              Purchase
-            </button>
-          </div>
-        ))}
+              <h3 className="text-xl font-bold mb-2">{reward.title}</h3>
+              <p className="mb-4">Points: {reward.points}</p>
+              <button
+                className={`py-2 px-4 rounded ${isAffordable ? 'bg-amber-600 hover:bg-amber-700' : 'bg-gray-500 cursor-not-allowed'}`}
+                onClick={() => isAffordable && handlePurchase(reward.points, reward.id)}
+                disabled={!isAffordable}
+              >
+                {isAffordable ? 'Purchase' : 'Not enough points'}
+              </button>
+            </div>
+          );
+        })}
       </div>
       <div className="mt-10">
         <h2 className="text-2xl font-bold mb-4 flex items-center" onClick={() => setAddRewardOpen(!addRewardOpen)}>

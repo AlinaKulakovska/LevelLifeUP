@@ -6,19 +6,22 @@ import AuthPopup from '../components/AuthPopup';
 import SidebarHeader from '../components/SidebarHeader';
 import Sidebar from '../components/Sidebar';
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
-
+import EditProfilePopup from '../components/EditProfilePopup';
 const Profile = () => {
   const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
   const [userlogined, setUserlogined] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
+  const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
 
   const openAuthPopup = () => setIsAuthPopupOpen(true);
   const closeAuthPopup = () => setIsAuthPopupOpen(false);
   const toggleSidebar = () => setIsOpen(!isOpen);
+  const openEditPopup = () => setIsEditPopupOpen(true);
+  const closeEditPopup = () => setIsEditPopupOpen(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -42,6 +45,26 @@ const Profile = () => {
     return () => unsubscribe();
   }, []);
 
+  const handleSaveProfile = async (newInfo) => {
+    if (userlogined) {
+      try {
+        const userDocRef = doc(db, 'users', userlogined.uid);
+        await updateDoc(userDocRef, {
+          name: newInfo.name,
+          avatar: newInfo.avatarUrl,
+        });
+        setUserInfo((prev) => ({
+          ...prev,
+          name: newInfo.name,
+          avatar: newInfo.avatarUrl,
+        }));
+        closeEditPopup();
+      } catch (error) {
+        console.error("Error updating profile: ", error);
+      }
+    }
+  };
+
   const signOutUser = async () => {
     try {
       await signOut(auth);
@@ -55,29 +78,41 @@ const Profile = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
-
   return (
     <div className="kanit-regular bg-[#282424]">
       {isAuthPopupOpen && <AuthPopup onClose={closeAuthPopup} />}
-      <SidebarHeader 
-        userlogined={userlogined} 
-        signOutUser={signOutUser} 
-        openAuthPopup={openAuthPopup} 
-        toggleSidebar={toggleSidebar} 
+      {isEditPopupOpen && (
+        <EditProfilePopup
+          userInfo={userInfo}
+          onSave={handleSaveProfile}
+          onClose={closeEditPopup}
+        />
+      )}
+      <SidebarHeader
+        userlogined={userlogined}
+        signOutUser={signOutUser}
+        openAuthPopup={openAuthPopup}
+        toggleSidebar={toggleSidebar}
         points={userInfo ? userInfo.points : ""}
       />
       <div className='flex'>
         <Sidebar isOpen={isOpen} />
         <div className="rounded-lg overflow-hidden text-white w-full">
           <div className="flex items-center p-6 bg-neutral-950 text-white pattern">
-            <img
-              className="w-20 h-20 rounded-full mr-4"
-              src={userPhoto}
+          <img
+              className="w-28 h-28 rounded-full mr-4"
+              src={userInfo?.avatar || userPhoto}
               alt="User"
             />
             <div>
               <h1 className="text-2xl font-bold">{userInfo?.name || 'User Name'}</h1>
               <p className='text-neutral-200'>{userInfo?.email || 'User Email'}</p>
+              <button
+                onClick={openEditPopup}
+                className="mt-4 bg-amber-600 py-2 px-4 rounded-md"
+              >
+                Edit Profile
+              </button>
             </div>
           </div>
           <div className="p-6">
@@ -92,7 +127,7 @@ const Profile = () => {
                 <p>{userInfo?.points || 0}</p>
               </div>
               <div className="bg-[#393434] p-4 rounded-lg">
-                <h3 className="font-bold">Tasks Completed</h3>
+                <h3 className="font-bold">Quests Completed</h3>
                 <p>{userInfo?.tasksCompleted || 0}</p>
               </div>
             </div>
@@ -119,7 +154,7 @@ const Profile = () => {
             </div>
             <div>
               {/* get from firebase */}
-              <Rewards userId={userlogined.uid}/>
+              <Rewards userId={userlogined.uid} />
             </div>
           </div>
         </div>
