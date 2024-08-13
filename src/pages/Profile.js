@@ -9,6 +9,9 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import EditProfilePopup from '../components/EditProfilePopup';
+
+
+
 const Profile = () => {
   const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
   const [userlogined, setUserlogined] = useState(null);
@@ -65,6 +68,8 @@ const Profile = () => {
     }
   };
 
+  
+
   const signOutUser = async () => {
     try {
       await signOut(auth);
@@ -78,6 +83,10 @@ const Profile = () => {
   if (loading) {
     return <div>Loading...</div>;
   }
+
+
+
+  
   return (
     <div className="kanit-regular bg-[#282424]">
       {isAuthPopupOpen && <AuthPopup onClose={closeAuthPopup} />}
@@ -120,7 +129,7 @@ const Profile = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-[#393434] p-4 rounded-lg">
                 <h3 className="font-bold">Level</h3>
-                <p>{userInfo?.level || 0}</p>
+                <p>{userInfo?.level || 0} - "{userInfo?.title || 'Beginner'}"</p>
               </div>
               <div className="bg-[#393434] p-4 rounded-lg">
                 <h3 className="font-bold">Points</h3>

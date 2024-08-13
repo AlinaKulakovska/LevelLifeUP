@@ -7,9 +7,24 @@ import SidebarHeader from '../components/SidebarHeader';
 import Sidebar from '../components/Sidebar';
 import AuthPopup from '../components/AuthPopup';
 
-import { onAuthStateChanged, signOut} from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { auth, db } from "../firebase";
+
+const generateTitle = (level) => {
+  const titles = [
+    'Novice Explorer',
+    'Apprentice Adventurer',
+    'Journeyman Wanderer',
+    'Master Navigator',
+    'Epic Conqueror',
+    'Legendary Hero'
+  ];
+
+  return titles[level % titles.length] || 'Ultimate Champion';
+};
+
+
 const Tasks = () => {
   const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
   const [userlogined, setUserlogined] = useState(null);
@@ -32,13 +47,6 @@ const Tasks = () => {
       console.error("Error signing out: ", error);
     }
   };
-
-  // useEffect(() => {
-  //   const unsubscribe = onAuthStateChanged(auth, (user) => {
-  //     setUserlogined(user);
-  //   });
-  //   return () => unsubscribe();
-  // }, []);
 
   useEffect(() => {
     const fetchUserData = async (user) => {
@@ -88,17 +96,24 @@ const Tasks = () => {
     const completedTask = tasks.find(task => task.id === taskId);
     const updatedTasks = tasks.filter(task => task.id !== taskId);
     setTasks(updatedTasks);
-  
+
     if (userlogined && completedTask) {
       const updatedPoints = (userInfo.points || 0) + Number(completedTask.xp);
       const categories = ['Health', 'Work', 'Hobbies', 'Self-care', 'Friends'];
       const categoryIndex = categories.indexOf(completedTask.category);
-  
+
       let updatedStats = [...(userInfo.statistics || [0, 0, 0, 0, 0])];
       if (categoryIndex !== -1) {
         updatedStats[categoryIndex] += 1;
       }
-  
+      let updatedTasksCompleted = (userInfo.tasksCompleted || 0) + 1;
+      let newLevel = userInfo.level || 1;
+      let newTitle = userInfo.title || "Beginner";
+
+      if (updatedTasksCompleted % 10 === 0) {
+        newLevel += 1;
+        newTitle = generateTitle(newLevel);
+      }
       try {
         const userDocRef = doc(db, 'users', userlogined.uid);
         await updateDoc(userDocRef, {
@@ -106,20 +121,25 @@ const Tasks = () => {
           points: updatedPoints,
           tasksCompleted: (userInfo.tasksCompleted || 0) + 1,
           statistics: updatedStats,
+          level: newLevel,
+          title: newTitle,
         });
-  
+
         setUserInfo((prev) => ({
           ...prev,
           points: updatedPoints,
           tasksCompleted: (userInfo.tasksCompleted || 0) + 1,
           statistics: updatedStats,
+          level: newLevel,
+          title: newTitle,
         }));
       } catch (error) {
         console.error("Error completing task: ", error);
       }
     }
+
   };
-  
+
 
   const handleAddHabit = async (newHabit) => {
     const updatedHabits = [...habits, { ...newHabit, id: habits.length + 1 }];
@@ -223,7 +243,7 @@ const Tasks = () => {
                   {sortedTasks
                     .filter(task => task.category === category)
                     .map(task => (
-                      <TaskCard key={task.id} task={task} onComplete={handleComplete} onDelete={handleDeleteTask}/>
+                      <TaskCard key={task.id} task={task} onComplete={handleComplete} onDelete={handleDeleteTask} />
                     ))}
                 </div>
               </div>
@@ -234,7 +254,7 @@ const Tasks = () => {
             <h2 className="text-2xl font-semibold mb-4 ml-6 text-white">Your Habits</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {habits.map(habit => (
-                <TaskCard key={habit.id} task={habit} onComplete={handleHabitComplete}   onDelete={handleDeleteHabit} />
+                <TaskCard key={habit.id} task={habit} onComplete={handleHabitComplete} onDelete={handleDeleteHabit} />
               ))}
             </div>
           </div>
