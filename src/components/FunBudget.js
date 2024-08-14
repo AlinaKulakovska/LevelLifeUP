@@ -7,6 +7,7 @@ const FunBudget = ({ userId }) => {
     const [maxBudget, setMaxBudget] = useState(1000);
     const [progress, setProgress] = useState(0);
     const [userBudgetleft, setUserBudgetleft] = useState(0);
+
     useEffect(() => {
         const fetchBudget = async () => {
             if (userId) {
@@ -31,7 +32,7 @@ const FunBudget = ({ userId }) => {
         if (newBudget <= maxBudget) {
             setBudget(newBudget);
             setProgress((newBudget / maxBudget) * 100);
-            setUserBudgetleft(userBudgetleft)
+            setUserBudgetleft(maxBudget - newBudget)
             if (userId) {
                 try {
                     const userDocRef = doc(db, 'users', userId);
@@ -40,6 +41,7 @@ const FunBudget = ({ userId }) => {
                         budgetLeft: maxBudget - newBudget,
 
                     });
+                   
                 } catch (error) {
                     console.error("Error updating budget: ", error);
                 }
@@ -50,7 +52,7 @@ const FunBudget = ({ userId }) => {
     const handleMaxBudgetChange = async (newMaxBudget) => {
         setMaxBudget(newMaxBudget);
         setProgress((budget / newMaxBudget) * 100);
-
+        setUserBudgetleft(maxBudget - budget)
         if (userId) {
             try {
                 const userDocRef = doc(db, 'users', userId);
@@ -58,9 +60,11 @@ const FunBudget = ({ userId }) => {
                     maxFunBudget: newMaxBudget,
                     budgetLeft: maxBudget - budget,
                 });
+              
             } catch (error) {
                 console.error("Error updating max budget: ", error);
             }
+            
         }
     };
 
@@ -73,19 +77,20 @@ const FunBudget = ({ userId }) => {
                     style={{ width: `${progress}%` }}
                 />
             </div>
-            <p className="text-sm">Budget: ${userBudgetleft}</p>
+            <p className="text-md">Budget: ${userBudgetleft}</p>
+            <p className="text-sm">Set your Expenses</p>
             <input
                 type="number"
                 value={budget}
                 onChange={(e) => handleBudgetChange(parseInt(e.target.value))}
-                className="mt-1 block w-full p-1 text-neutral-600 rounded-md bg-white border border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="mt-1 block w-full pl-1 text-neutral-600 rounded-md bg-white border border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
-            <p className="text-sm mt-2">Set Max Budget</p>
+            <p className="text-sm">Set Max Budget</p>
             <input
                 type="number"
                 value={maxBudget}
                 onChange={(e) => handleMaxBudgetChange(parseInt(e.target.value))}
-                className="mt-1 block w-full p-1 text-neutral-600 rounded-md bg-white border border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="mt-1 block w-full pl-1 text-neutral-600 rounded-md bg-white border border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
         </div>
     );

@@ -89,8 +89,8 @@ const Rewards = ({ userId }) => {
               className="shadow-md rounded-lg p-6 bg-[#393434]"
             >
               <h3 className="text-xl font-bold mb-2">{reward.title}</h3>
-              <p className="mb-4">Points Required: {reward.points}</p>
-              <p className="mb-4">Money Required: {reward.moneyCost}</p>
+              <p className="mb-2">Points Required: {reward.points}</p>
+              <p className="mb-2">Money Required: {reward.moneyCost}</p>
               <button
                 className={`py-2 px-4 rounded ${isAffordableXP &&  isAffordableMoney ? 'bg-amber-600 hover:bg-amber-700' : 'bg-gray-500 cursor-not-allowed'}`}
                 onClick={() => isAffordableXP && isAffordableMoney && handlePurchase(reward.points, reward.id, reward.moneyCost)}
