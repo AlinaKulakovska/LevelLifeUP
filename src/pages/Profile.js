@@ -143,7 +143,7 @@ const Profile = () => {
               <RadarChart userData={userInfo?.statistics || [0, 0, 0, 0, 0]} />
               
               <div className='mt-4'>
-                  <FunBudget userId={userlogined.uid} />
+                  <FunBudget userId={userlogined ? userlogined.uid : ""} />
                 </div>
             
             </div>
