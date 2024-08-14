@@ -13,6 +13,7 @@ const Rewards = ({ userId }) => {
   
 
   useEffect(() => {
+    if (!userId) return;
     // Fetch rewards and user points from Firestore
     const fetchUserRewards = async () => {
       const userDocRef = doc(db, 'users', userId);

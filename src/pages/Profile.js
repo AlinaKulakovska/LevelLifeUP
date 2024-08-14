@@ -6,11 +6,12 @@ import AuthPopup from '../components/AuthPopup';
 import SidebarHeader from '../components/SidebarHeader';
 import Sidebar from '../components/Sidebar';
 import FunBudget from '../components/FunBudget';
+import EditProfilePopup from '../components/EditProfilePopup';
 
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
-import EditProfilePopup from '../components/EditProfilePopup';
+
 
 const Profile = () => {
   const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
@@ -28,25 +29,29 @@ const Profile = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userDocRef = doc(db, 'users', user.uid);
-        const userDocSnap = await getDoc(userDocRef);
-
-        setUserlogined(user);
-        if (userDocSnap.exists()) {
-          setUserInfo(userDocSnap.data());
-        } else {
-          console.log('No such document!');
+      if (user) {  // Ensure user and user.uid are defined
+        try {
+          const userDocRef = doc(db, 'users', user.uid);
+          const userDocSnap = await getDoc(userDocRef);
+  
+          setUserlogined(user);
+          if (userDocSnap.exists()) {
+            setUserInfo(userDocSnap.data());
+          } else {
+            console.log('No such document!');
+          }
+        } catch (error) {
+          console.error("Error fetching user document: ", error);
         }
       } else {
         console.log('User is not signed in');
-        setUserInfo(null);
       }
       setLoading(false);
     });
-
+  
     return () => unsubscribe();
   }, []);
+  
 
   const handleSaveProfile = async (newInfo) => {
     if (userlogined) {
@@ -87,13 +92,13 @@ const Profile = () => {
       {isAuthPopupOpen && <AuthPopup onClose={closeAuthPopup} />}
       {isEditPopupOpen && (
         <EditProfilePopup
-          userInfo={userInfo}
+          userInfo={userInfo ? userInfo : ""}
           onSave={handleSaveProfile}
           onClose={closeEditPopup}
         />
       )}
       <SidebarHeader
-        userlogined={userlogined}
+        userlogined={userlogined ? userlogined : ""}
         signOutUser={signOutUser}
         openAuthPopup={openAuthPopup}
         toggleSidebar={toggleSidebar}
