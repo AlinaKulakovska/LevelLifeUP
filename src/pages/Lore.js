@@ -25,7 +25,7 @@ const generateTitle = (level) => {
 };
 
 
-const Tasks = () => {
+const Lore = () => {
   const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
   const [userlogined, setUserlogined] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
@@ -77,15 +77,14 @@ const Tasks = () => {
   }, []);
 
   const handleAddTask = async (newTask) => {
-    const taskId = Date.now(); // Use current timestamp as the unique task ID
-    const updatedTasks = [...tasks, { ...newTask, id: taskId }];
+    const updatedTasks = [...tasks, { ...newTask, id: tasks.length + 1 }];
     setTasks(updatedTasks);
-  
+
     if (userlogined) {
       try {
         const userDocRef = doc(db, 'users', userlogined.uid);
         await updateDoc(userDocRef, {
-          tasks: arrayUnion({ ...newTask, id: taskId }),
+          tasks: arrayUnion({ ...newTask, id: tasks.length + 1 }),
         });
       } catch (error) {
         console.error("Error adding task: ", error);
@@ -143,15 +142,14 @@ const Tasks = () => {
 
 
   const handleAddHabit = async (newHabit) => {
-    const habbitid = Date.now(); // Use current timestamp as the unique task ID
-    const updatedHabits = [...habits, { ...newHabit, id: habbitid}];
+    const updatedHabits = [...habits, { ...newHabit, id: habits.length + 1 }];
     setHabits(updatedHabits);
 
     if (userlogined) {
       try {
         const userDocRef = doc(db, 'users', userlogined.uid);
         await updateDoc(userDocRef, {
-          habits: arrayUnion({ ...newHabit, id: habbitid}),
+          habits: arrayUnion({ ...newHabit, id: habits.length + 1 }),
         });
       } catch (error) {
         console.error("Error adding habit: ", error);
@@ -279,4 +277,4 @@ const Tasks = () => {
   );
 };
 
-export default Tasks;
+export default Lore;

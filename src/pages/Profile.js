@@ -5,12 +5,12 @@ import Rewards from '../components/Rewards';
 import AuthPopup from '../components/AuthPopup';
 import SidebarHeader from '../components/SidebarHeader';
 import Sidebar from '../components/Sidebar';
+import FunBudget from '../components/FunBudget';
+
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import EditProfilePopup from '../components/EditProfilePopup';
-
-
 
 const Profile = () => {
   const [isAuthPopupOpen, setIsAuthPopupOpen] = useState(false);
@@ -68,8 +68,6 @@ const Profile = () => {
     }
   };
 
-  
-
   const signOutUser = async () => {
     try {
       await signOut(auth);
@@ -84,9 +82,6 @@ const Profile = () => {
     return <div>Loading...</div>;
   }
 
-
-
-  
   return (
     <div className="kanit-regular bg-[#282424]">
       {isAuthPopupOpen && <AuthPopup onClose={closeAuthPopup} />}
@@ -108,7 +103,7 @@ const Profile = () => {
         <Sidebar isOpen={isOpen} />
         <div className="rounded-lg overflow-hidden text-white w-full">
           <div className="flex items-center p-6 bg-neutral-950 text-white pattern">
-          <img
+            <img
               className="w-28 h-28 rounded-full mr-4"
               src={userInfo?.avatar || userPhoto}
               alt="User"
@@ -139,31 +134,21 @@ const Profile = () => {
                 <h3 className="font-bold">Quests Completed</h3>
                 <p>{userInfo?.tasksCompleted || 0}</p>
               </div>
+              <div className="bg-[#393434] p-4 rounded-lg">
+                <h3 className="font-bold">Lore</h3>
+                <p>Lore points</p>
+              </div>
             </div>
             <div className='flex flex-wrap'>
               <RadarChart userData={userInfo?.statistics || [0, 0, 0, 0, 0]} />
-              <div>
-                <div>
-                  <h2 className="text-xl font-bold mt-6 mb-4">Achievements</h2>
-                  <ul className="list-disc list-inside p-4 rounded-lg">
-                    {userInfo?.achievements?.map((achievement, index) => (
-                      <li key={index}>{achievement}</li>
-                    )) || 'No Achievements'}
-                  </ul>
+              
+              <div className='mt-4'>
+                  <FunBudget userId={userlogined.uid} />
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold mt-6 mb-4">Badges</h2>
-                  <div className="flex space-x-4">
-                    {userInfo?.badges?.map((badge, index) => (
-                      <img key={index} className="w-12 h-12" src={badge} alt={`Badge ${index + 1}`} />
-                    )) || 'No Badges'}
-                  </div>
-                </div>
-              </div>
+            
             </div>
             <div>
-              {/* get from firebase */}
-              <Rewards userId={userlogined.uid} />
+              <Rewards userId={userlogined ? userlogined.uid : ""} />
             </div>
           </div>
         </div>

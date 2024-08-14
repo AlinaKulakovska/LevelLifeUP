@@ -5,9 +5,12 @@ import { db } from "../firebase"; // Ensure this points to your Firebase configu
 
 const Rewards = ({ userId }) => {
   const [rewards, setRewards] = useState([]);
-  const [newReward, setNewReward] = useState({ title: '', points: '' });
+  const [newReward, setNewReward] = useState({ title: '', points: '', moneyCost: ''});
   const [addRewardOpen, setAddRewardOpen] = useState(false);
   const [userPoints, setUserPoints] = useState(0);
+  const [userBudget, setUserBudget] = useState(0);
+  const [usermaxBudget, setUsermaxBudget] = useState(0);
+  
 
   useEffect(() => {
     // Fetch rewards and user points from Firestore
@@ -19,6 +22,8 @@ const Rewards = ({ userId }) => {
         const userData = userDocSnap.data();
         setRewards(userData.rewards || []);
         setUserPoints(userData.points || 0);
+        setUserBudget(userData.budgetLeft || 0);
+        setUsermaxBudget(userData.maxFunBudget || 0)
       }
     };
 
@@ -35,7 +40,7 @@ const Rewards = ({ userId }) => {
     if (newReward.title && newReward.points) {
       const updatedRewards = [
         ...rewards,
-        { id: rewards.length + 1, title: newReward.title, points: Number(newReward.points) },
+        { id: rewards.length + 1, title: newReward.title, points: Number(newReward.points), moneyCost: Number(newReward.moneyCost) },
       ];
       setRewards(updatedRewards);
 
@@ -43,23 +48,26 @@ const Rewards = ({ userId }) => {
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, { rewards: updatedRewards });
 
-      setNewReward({ title: '', points: '' });
+      setNewReward({ title: '', points: '', moneyCost: ''});
     }
   };
 
-  const handlePurchase = async (points, rewardId) => {
-    if (userPoints >= points) {
+  const handlePurchase = async (points, rewardId, moneyCost) => {
+    if (userPoints >= points && userBudget >= moneyCost) {
       const remainingRewards = rewards.filter((reward) => reward.id !== rewardId);
       const updatedPoints = userPoints - points;
+      const updatedBudget = userBudget - moneyCost;
 
       setRewards(remainingRewards);
       setUserPoints(updatedPoints);
-
+      setUserBudget(updatedBudget)
       // Update Firestore with the new rewards and points
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, {
         rewards: remainingRewards,
         points: updatedPoints,
+        budgetLeft: updatedBudget,
+        funBudget: usermaxBudget - updatedBudget,
       });
 
       alert(`Purchased for ${points} points!`);
@@ -73,20 +81,24 @@ const Rewards = ({ userId }) => {
       <h2 className="text-2xl font-bold mb-6">Rewards</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {rewards.map((reward) => {
-          const isAffordable = userPoints >= reward.points;
+          const isAffordableXP = userPoints >= reward.points;
+          const isAffordableMoney = userBudget >= reward.moneyCost;
           return (
-            <div 
-              key={reward.id} 
+            <div
+              key={reward.id}
               className="shadow-md rounded-lg p-6 bg-[#393434]"
             >
               <h3 className="text-xl font-bold mb-2">{reward.title}</h3>
-              <p className="mb-4">Points: {reward.points}</p>
+              <p className="mb-4">Points Required: {reward.points}</p>
+              <p className="mb-4">Money Required: {reward.moneyCost}</p>
               <button
-                className={`py-2 px-4 rounded ${isAffordable ? 'bg-amber-600 hover:bg-amber-700' : 'bg-gray-500 cursor-not-allowed'}`}
-                onClick={() => isAffordable && handlePurchase(reward.points, reward.id)}
-                disabled={!isAffordable}
+                className={`py-2 px-4 rounded ${isAffordableXP &&  isAffordableMoney ? 'bg-amber-600 hover:bg-amber-700' : 'bg-gray-500 cursor-not-allowed'}`}
+                onClick={() => isAffordableXP && isAffordableMoney && handlePurchase(reward.points, reward.id, reward.moneyCost)}
+                disabled={!isAffordableXP && !isAffordableMoney}
               >
-                {isAffordable ? 'Purchase' : 'Not enough points'}
+                {isAffordableXP ? '' : 'Not enough points'}
+                {isAffordableMoney ? '' : 'Not enough Money'}
+                {isAffordableMoney && isAffordableXP ? 'Purchase' : ''}
               </button>
             </div>
           );
@@ -109,6 +121,7 @@ const Rewards = ({ userId }) => {
                 name="title"
                 value={newReward.title}
                 onChange={handleInputChange}
+                required
                 className="shadow appearance-none bg-neutral-800 border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
               />
             </div>
@@ -122,6 +135,21 @@ const Rewards = ({ userId }) => {
                 name="points"
                 value={newReward.points}
                 onChange={handleInputChange}
+                required
+                className="shadow appearance-none border bg-neutral-800 rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-bold mb-2" htmlFor="moneyCost">
+                Money Cost
+              </label>
+              <input
+                type="number"
+                id="moneyCost"
+                name="moneyCost"
+                value={newReward.moneyCost}
+                onChange={handleInputChange}
+                required
                 className="shadow appearance-none border bg-neutral-800 rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline"
               />
             </div>

@@ -35,11 +35,9 @@ const AuthPopup = ({ onClose, }) => {
       const initialUserInfo = {
         email: user.email,
         title: 'Newbie',
-        level: 0,
+        level: 1,
         points: 0,
         tasksCompleted: 0,
-        achievements: [],
-        badges: [], // Add paths to badge images if needed
         statistics: [0, 0, 0, 0, 0], // Hobbies, Friends, Work, Self-care, Love
         rewards: [{ id: 1, title: 'Gift Card', points: 50 },
         { id: 2, title: 'Extra Day Off', points: 100 },],
