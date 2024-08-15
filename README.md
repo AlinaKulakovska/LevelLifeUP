@@ -1,70 +1,24 @@
-# Getting Started with Create React App
+Website is a task-tracking app that provides a gamified experience to motivate users to manage and complete their daily tasks and hobbies but also doesn`t let forget to have some fun. 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Here's how it works:
 
-## Available Scripts
+<b>User Authentication</b>: Users can sign up and log in to personalize their task management experience.
 
-In the project directory, you can run:
+<b>Task Management</b>: Users can create, categorize, and manage tasks in five key categories, such as health, work, or hobbies.
 
-### `npm start`
+<b>Gamification</b>: Completing tasks earns users XP (experience points), which they can spend on rewards they create. The site has a leveling system where users level up after completing a certain number of tasks.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+<b>Progress Tracking & Statistics</b>: The platform tracks statistics, including the number of tasks completed overall and the category breakdown to show which types of tasks the user engages with the most.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+<b>Rewards System</b>: Users can create their own rewards and use XP to purchase them. If a reward requires more XP than they have or exceeds their monthly fun budget, they will not be able to purchase it.
 
-### `npm test`
+<b>Monthly Fun Budget</b>: A monthly budget is provided for users to spend on rewards. This budget refreshes every month and is connected to the user's XP and money system.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+The front-end is developed using React, styled with Tailwind CSS, and built with JavaScript, while the backend is powered by Firebase to manage user data, authentication, and task tracking.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
