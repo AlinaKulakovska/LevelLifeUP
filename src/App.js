@@ -1,6 +1,7 @@
 import './App.css';
 import Profile from './pages/Profile';
 import Tasks from './pages/Tasks';
+import Lore from './pages/Lore';
 import { BrowserRouter, Route, Routes} from 'react-router-dom';
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Profile />} />
           <Route path="/tasks" element={<Tasks />} />
+          <Route path="/lore" element={<Lore />} />
         </Routes>
       </BrowserRouter>
     </div>

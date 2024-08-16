@@ -5,24 +5,24 @@ const TaskForm = ({ onAddTask }) => {
     const [description, setDescription] = useState('');
     const [category, setCategory] = useState('Health');
     const [xp, setXp] = useState('');
-    const [isUrgent, setIsUrgent] = useState(false); // New state for urgency
+    const [date, setDate] = useState(''); // New state for date input
+    const [isUrgent, setIsUrgent] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (title && description && category && xp) {
-            onAddTask({ title, description, category, xp: parseInt(xp), isUrgent }); // Include isUrgent in task data
+        if (title && description && category && xp && date) {
+            onAddTask({ title, description, category, xp: parseInt(xp), date, isUrgent });
             setTitle('');
             setDescription('');
             setCategory('Health');
             setXp('');
-            setIsUrgent(false); // Reset urgency after submission
+            setDate(''); // Reset date after submission
+            setIsUrgent(false);
         }
     };
 
-
     return (
         <div className='kanit-regular'>
-
             <form onSubmit={handleSubmit} className="p-4 bg-[#393434] rounded-md text-white space-y-4 m-4">
                 <div>
                     <label className="block text-sm font-medium">Task Title</label>
@@ -39,6 +39,15 @@ const TaskForm = ({ onAddTask }) => {
                         type="text"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
+                        className="mt-1 block w-full p-1 text-neutral-600 rounded-md bg-white border border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium">Date</label>
+                    <input
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
                         className="mt-1 block w-full p-1 text-neutral-600 rounded-md bg-white border border-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
                     />
                 </div>
@@ -79,7 +88,8 @@ const TaskForm = ({ onAddTask }) => {
                 >
                     Add Task
                 </button>
-            </form></div>
+            </form>
+        </div>
     );
 };
 

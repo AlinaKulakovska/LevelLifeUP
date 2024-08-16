@@ -1,6 +1,6 @@
-import React from 'react';
 
 const TaskCard = ({ task, onComplete, onDelete }) => {
+
   return (
     <div
       className={`p-4 rounded-md shadow-md text-white mx-4 flex flex-col justify-between bg-[#393434] ${
@@ -15,7 +15,7 @@ const TaskCard = ({ task, onComplete, onDelete }) => {
       <div>
         <button
           onClick={() => onComplete(task.id)}
-          className="text-white bg-amber-600 py-2 px-4 mt-3 rounded-md"
+          className="text-white bg-amber-600 py-2 px-4 my-3 rounded-md"
         >
           Complete
         </button>
@@ -26,6 +26,7 @@ const TaskCard = ({ task, onComplete, onDelete }) => {
           Delete
         </button>
       </div>
+      {task.date ? <p className="text-sm">Deadline: {task.date}</p> : ''} 
     </div>
   );
 };

@@ -21,6 +21,9 @@ const Profile = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
 
+  const [loreAchievements, setLoreAchievements] = useState([]);
+  const [futureGoals, setFutureGoals] = useState([]);
+
   const openAuthPopup = () => setIsAuthPopupOpen(true);
   const closeAuthPopup = () => setIsAuthPopupOpen(false);
   const toggleSidebar = () => setIsOpen(!isOpen);
@@ -29,14 +32,17 @@ const Profile = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {  // Ensure user and user.uid are defined
+      if (user) {
         try {
           const userDocRef = doc(db, 'users', user.uid);
           const userDocSnap = await getDoc(userDocRef);
-  
+
           setUserlogined(user);
           if (userDocSnap.exists()) {
-            setUserInfo(userDocSnap.data());
+            const userData = userDocSnap.data();
+            setUserInfo(userData);
+            setLoreAchievements(userData.loreAchievements || []);
+            setFutureGoals(userData.futureGoals || []);
           } else {
             console.log('No such document!');
           }
@@ -48,10 +54,9 @@ const Profile = () => {
       }
       setLoading(false);
     });
-  
+
     return () => unsubscribe();
   }, []);
-  
 
   const handleSaveProfile = async (newInfo) => {
     if (userlogined) {
@@ -115,7 +120,6 @@ const Profile = () => {
             />
             <div>
               <h1 className="text-2xl font-bold">{userInfo?.name || 'User Name'}</h1>
-              <p className='text-neutral-200'>{userInfo?.email || 'User Email'}</p>
               <button
                 onClick={openEditPopup}
                 className="mt-4 bg-amber-600 py-2 px-4 rounded-md"
@@ -139,18 +143,34 @@ const Profile = () => {
                 <h3 className="font-bold">Quests Completed</h3>
                 <p>{userInfo?.tasksCompleted || 0}</p>
               </div>
-              <div className="bg-[#393434] p-4 rounded-lg">
-                <h3 className="font-bold">Lore</h3>
-                <p>Lore points</p>
-              </div>
             </div>
             <div className='flex flex-wrap'>
               <RadarChart userData={userInfo?.statistics || [0, 0, 0, 0, 0]} />
-              
+
               <div className='mt-4'>
-                  <FunBudget userId={userlogined ? userlogined.uid : ""} />
+                <FunBudget userId={userlogined ? userlogined.uid : ""} />
+              </div>
+              <div className='mx-4'>
+                <div className="mt-6">
+                  <h2 className="text-xl font-bold mb-4">Achievements</h2>
+                  <ul>
+                    {loreAchievements.map((achievement) => (
+                      <li key={achievement.id} className="bg-[#393434] p-2 rounded-lg mb-2">
+                        {achievement.title}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-            
+                <div className="mt-6">
+                  <h2 className="text-xl font-bold mb-4">Future Goals</h2>
+                  <ul>
+                    {futureGoals.map((goal) => (
+                      <li key={goal.id} className="bg-[#393434] p-2 rounded-lg mb-2 text-gray-400">
+                        {goal.title}
+                      </li>
+                    ))}
+                  </ul>
+                </div></div>
             </div>
             <div>
               <Rewards userId={userlogined ? userlogined.uid : ""} />

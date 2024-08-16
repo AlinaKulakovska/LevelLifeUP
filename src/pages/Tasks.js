@@ -2,7 +2,9 @@ import { FaChevronDown } from 'react-icons/fa';
 import React, { useState, useEffect } from 'react';
 
 import TaskCard from '../components/TaskCard';
+import HabitCard from '../components/HabitCard';
 import TaskForm from '../components/TaskForm';
+import HabitForm from '../components/HabitForm';
 import SidebarHeader from '../components/SidebarHeader';
 import Sidebar from '../components/Sidebar';
 import AuthPopup from '../components/AuthPopup';
@@ -169,7 +171,7 @@ const Tasks = () => {
           points: updatedPoints,
         });
         setUserInfo((prev) => ({ ...prev, points: updatedPoints }));
-        console.log(`Habit completed: ${completedHabit.title}, XP: ${completedHabit.xp}`);
+        alert(`Habit completed: ${completedHabit.title}, XP: ${completedHabit.xp}`);
       } catch (error) {
         console.error("Error completing habit: ", error);
       }
@@ -236,10 +238,10 @@ const Tasks = () => {
       />
       <div className='flex'>
         <Sidebar isOpen={isOpen} />
-        <div className='flex flex-col mt-8'>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 text-white kanit-regular">
+        <div className='flex flex-col w-full mt-8'>
+          <div className="grid grid-cols-1 w-full  sm:grid-cols-3 md:grid-cols-4  lg:grid-cols-5 gap-4 text-white kanit-regular">
             {categories.map((category) => (
-              <div key={category}>
+              <div key={category} className='w-full'>
                 <h2 className="text-xl font-semibold mb-2 text-center">{category}</h2>
                 <div className="space-y-4">
                   {sortedTasks
@@ -256,18 +258,18 @@ const Tasks = () => {
             <h2 className="text-2xl font-semibold mb-4 ml-6 text-white">Your Habits</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {habits.map(habit => (
-                <TaskCard key={habit.id} task={habit} onComplete={handleHabitComplete} onDelete={handleDeleteHabit} />
+                <HabitCard key={habit.id} habit={habit} onComplete={handleHabitComplete} onDelete={handleDeleteHabit} />
               ))}
             </div>
           </div>
 
-          <div className='flex justify-between mx-4 my-8'>
-            <div className='w-1/2'>
+          <div className='flex justify-between flex-col md:flex-row mx-1 md:mx-4 my-8 '>
+            <div className='w-full md:w-1/2'>
               <h2 className='text-white text-2xl kanit-bold ml-6 flex items-center' onClick={togglehabitForm}>Add Habits <FaChevronDown className='ml-4' /></h2>
               {ishabitFormOpen && (
-                <TaskForm onAddTask={handleAddHabit} />
+                <HabitForm onAddHabit={handleAddHabit} />
               )}</div>
-            <div className='w-1/2'>  <h2 className='text-white text-2xl kanit-bold ml-6 flex items-center' onClick={toggleTaskForm}>Add Quest <FaChevronDown className='ml-4' /></h2>
+            <div className='w-full md:w-1/2'>  <h2 className='text-white text-2xl kanit-bold ml-6 flex items-center' onClick={toggleTaskForm}>Add Quest <FaChevronDown className='ml-4' /></h2>
               {isTaskFormOpen && (
                 <TaskForm onAddTask={handleAddTask} />
               )}</div>
