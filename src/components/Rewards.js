@@ -9,8 +9,6 @@ const Rewards = ({ userId }) => {
   const [addRewardOpen, setAddRewardOpen] = useState(false);
   const [userPoints, setUserPoints] = useState(0);
   const [userBudget, setUserBudget] = useState(0);
-  const [usermaxBudget, setUsermaxBudget] = useState(0);
-  
 
   useEffect(() => {
     if (!userId) return;
@@ -24,7 +22,6 @@ const Rewards = ({ userId }) => {
         setRewards(userData.rewards || []);
         setUserPoints(userData.points || 0);
         setUserBudget(userData.budgetLeft || 0);
-        setUsermaxBudget(userData.maxFunBudget || 0)
       }
     };
 
@@ -68,7 +65,7 @@ const Rewards = ({ userId }) => {
         rewards: remainingRewards,
         points: updatedPoints,
         budgetLeft: updatedBudget,
-        funBudget: usermaxBudget - updatedBudget,
+        funBudget: userBudget + moneyCost,
       });
 
       alert(`Purchased for ${points} points!`);

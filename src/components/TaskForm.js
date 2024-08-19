@@ -10,7 +10,7 @@ const TaskForm = ({ onAddTask }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (title && description && category && xp && date) {
+        if (title && category && xp) {
             onAddTask({ title, description, category, xp: parseInt(xp), date, isUrgent });
             setTitle('');
             setDescription('');
