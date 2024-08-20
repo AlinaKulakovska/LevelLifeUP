@@ -29,36 +29,36 @@ const FunBudget = ({ userId }) => {
     }, [userId]);
 
     const handleBudgetChange = async (newBudget) => {
-        if (newBudget <= maxBudget) {
             setBudget(newBudget);
             setProgress((newBudget / maxBudget) * 100);
             setUserBudgetleft(maxBudget - newBudget)
+            setMaxBudget(maxBudget)
             if (userId) {
                 try {
                     const userDocRef = doc(db, 'users', userId);
                     await updateDoc(userDocRef, {
                         funBudget: newBudget,
                         budgetLeft: maxBudget - newBudget,
-
+                        maxFunBudget: maxBudget,
                     });
                    
                 } catch (error) {
                     console.error("Error updating budget: ", error);
                 }
             }
-        }
+        
     };
 
     const handleMaxBudgetChange = async (newMaxBudget) => {
         setMaxBudget(newMaxBudget);
         setProgress((budget / newMaxBudget) * 100);
-        setUserBudgetleft(maxBudget - budget)
+        setUserBudgetleft(newMaxBudget - budget)
         if (userId) {
             try {
                 const userDocRef = doc(db, 'users', userId);
                 await updateDoc(userDocRef, {
                     maxFunBudget: newMaxBudget,
-                    budgetLeft: maxBudget - budget,
+                    budgetLeft: newMaxBudget - budget,
                 });
               
             } catch (error) {

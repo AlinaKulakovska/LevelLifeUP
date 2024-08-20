@@ -8,6 +8,7 @@ const Rewards = ({ userId }) => {
   const [newReward, setNewReward] = useState({ title: '', points: '', moneyCost: ''});
   const [addRewardOpen, setAddRewardOpen] = useState(false);
   const [userPoints, setUserPoints] = useState(0);
+  const [userBudgetLeft, setUserBudgetLeft] = useState(0);
   const [userBudget, setUserBudget] = useState(0);
 
   useEffect(() => {
@@ -21,7 +22,8 @@ const Rewards = ({ userId }) => {
         const userData = userDocSnap.data();
         setRewards(userData.rewards || []);
         setUserPoints(userData.points || 0);
-        setUserBudget(userData.budgetLeft || 0);
+        setUserBudgetLeft(userData.budgetLeft || 0);
+        setUserBudget(userData.funBudget || 0);
       }
     };
 
@@ -51,14 +53,15 @@ const Rewards = ({ userId }) => {
   };
 
   const handlePurchase = async (points, rewardId, moneyCost) => {
-    if (userPoints >= points && userBudget >= moneyCost) {
+    if (userPoints >= points && userBudgetLeft >= moneyCost) {
       const remainingRewards = rewards.filter((reward) => reward.id !== rewardId);
       const updatedPoints = userPoints - points;
-      const updatedBudget = userBudget - moneyCost;
+      const updatedBudget = userBudgetLeft - moneyCost;
 
       setRewards(remainingRewards);
       setUserPoints(updatedPoints);
-      setUserBudget(updatedBudget)
+      setUserBudgetLeft(updatedBudget)
+      setUserBudget(updatedBudget + moneyCost);
       // Update Firestore with the new rewards and points
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, {
