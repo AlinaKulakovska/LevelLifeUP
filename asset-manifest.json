@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/LevelLifeUP/static/css/main.3f889746.css",
-    "main.js": "/LevelLifeUP/static/js/main.66cc2efd.js",
+    "main.js": "/LevelLifeUP/static/js/main.effbd96d.js",
     "static/js/453.62b0b3f7.chunk.js": "/LevelLifeUP/static/js/453.62b0b3f7.chunk.js",
     "static/media/user-avatar.jpg": "/LevelLifeUP/static/media/user-avatar.862497a3bf7b74e40251.jpg",
     "static/media/Logo.png": "/LevelLifeUP/static/media/Logo.ef1a27cc56b1c6fb8280.png",
     "index.html": "/LevelLifeUP/index.html",
     "main.3f889746.css.map": "/LevelLifeUP/static/css/main.3f889746.css.map",
-    "main.66cc2efd.js.map": "/LevelLifeUP/static/js/main.66cc2efd.js.map",
+    "main.effbd96d.js.map": "/LevelLifeUP/static/js/main.effbd96d.js.map",
     "453.62b0b3f7.chunk.js.map": "/LevelLifeUP/static/js/453.62b0b3f7.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.3f889746.css",
-    "static/js/main.66cc2efd.js"
+    "static/js/main.effbd96d.js"
   ]
 }
