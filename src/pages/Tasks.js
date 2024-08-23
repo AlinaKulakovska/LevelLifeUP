@@ -33,7 +33,7 @@ const Tasks = () => {
   const [userInfo, setUserInfo] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [habits, setHabits] = useState([]);
-  const categories = ['Health', 'Work', 'Hobbies', 'Self-care', 'Friends'];
+  const categories = ['Health', 'Work', 'Hobbies', 'Chores', 'Social'];
   const [isTaskFormOpen, setIsTaskFormOpen] = useState(false);
   const [ishabitFormOpen, setIshabitFormOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -102,7 +102,7 @@ const Tasks = () => {
 
     if (userlogined && completedTask) {
       const updatedPoints = (userInfo.points || 0) + Number(completedTask.xp);
-      const categories = ['Health', 'Work', 'Hobbies', 'Self-care', 'Friends'];
+      const categories = ['Health', 'Work', 'Hobbies', 'Chores', 'Social'];
       const categoryIndex = categories.indexOf(completedTask.category);
 
       let updatedStats = [...(userInfo.statistics || [0, 0, 0, 0, 0])];

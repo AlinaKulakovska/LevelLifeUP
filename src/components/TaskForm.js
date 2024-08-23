@@ -61,8 +61,8 @@ const TaskForm = ({ onAddTask }) => {
                         <option value="Health">Health</option>
                         <option value="Work">Work</option>
                         <option value="Hobbies">Hobbies</option>
-                        <option value="Self-care">Self-care</option>
-                        <option value="Friends">Friends</option>
+                        <option value="Chores">Chores</option>
+                        <option value="Social">Social</option>
                     </select>
                 </div>
                 <div>

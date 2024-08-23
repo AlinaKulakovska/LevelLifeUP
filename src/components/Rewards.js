@@ -37,10 +37,11 @@ const Rewards = ({ userId }) => {
 
   const handleAddReward = async (e) => {
     e.preventDefault();
+    const rewardId = Date.now(); // Use current timestamp as the unique task ID
     if (newReward.title && newReward.points) {
       const updatedRewards = [
         ...rewards,
-        { id: rewards.length + 1, title: newReward.title, points: Number(newReward.points), moneyCost: Number(newReward.moneyCost) },
+        { id: rewardId, title: newReward.title, points: Number(newReward.points), moneyCost: Number(newReward.moneyCost) },
       ];
       setRewards(updatedRewards);
 
@@ -83,7 +84,7 @@ const Rewards = ({ userId }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {rewards.map((reward) => {
           const isAffordableXP = userPoints >= reward.points;
-          const isAffordableMoney = userBudget >= reward.moneyCost;
+          const isAffordableMoney = userBudgetLeft >= reward.moneyCost;
           return (
             <div
               key={reward.id}
