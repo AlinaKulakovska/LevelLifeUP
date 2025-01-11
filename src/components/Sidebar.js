@@ -11,6 +11,7 @@ const Sidebar = ({ isOpen }) => {
         <Link to="/" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-red-950">Profile</Link>
         <Link to="/tasks" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-orange-800">Quests</Link>
         <Link to="/lore" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-amber-600">Lore</Link>
+        <Link to="/bingo" className="block py-2.5 px-4 rounded transition border-b-2 border-stone-600 duration-200 hover:bg-amber-400">Bingo</Link>
       </div>
     </div>
   );

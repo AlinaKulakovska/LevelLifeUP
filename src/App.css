@@ -132,3 +132,8 @@
   body{
     background-color: #282424;
   }
+
+  .bingo-textarea{
+border: hsla(0, 2%, 49%, 0.034) !important;
+resize: none;
+  }
