@@ -86,11 +86,6 @@ const Bingo = () => {
         setBingoGrid(updatedGrid);
     };
 
-    const handleImageUpload = (row, col, imageUrl) => {
-        const updatedGrid = [...bingoGrid];
-        updatedGrid[row][col].imageUrl = imageUrl;
-        setBingoGrid(updatedGrid);
-    };
     const saveBingoGrid = async () => {
         if (userlogined) {
             const userDocRef = doc(db, "users", userlogined.uid);
@@ -102,21 +97,21 @@ const Bingo = () => {
             }
         }
     };
-    
+
     const checkBingoCompletion = () => {
         // Helper to group cells by row
         const getRow = (rowIndex) => bingoGrid.filter(cell => cell.id.startsWith(`${rowIndex}-`));
-    
+
         // Helper to group cells by column
         const getColumn = (colIndex) => bingoGrid.filter(cell => cell.id.endsWith(`-${colIndex}`));
-    
+
         // Helper to get diagonals
         const getDiagonals = () => {
             const mainDiagonal = bingoGrid.filter((_, index) => index % 6 === 0); // Top-left to bottom-right
             const antiDiagonal = bingoGrid.filter((_, index) => index % 4 === 0 && index !== 0 && index !== 24); // Top-right to bottom-left
             return [mainDiagonal, antiDiagonal];
         };
-    
+
         // Check rows and columns
         for (let i = 0; i < 5; i++) {
             const rowCompleted = getRow(i).every(cell => cell.completed);
@@ -125,16 +120,16 @@ const Bingo = () => {
                 return true;
             }
         }
-    
+
         // Check diagonals
         const [mainDiagonal, antiDiagonal] = getDiagonals();
         if (mainDiagonal.every(cell => cell.completed) || antiDiagonal.every(cell => cell.completed)) {
             return true;
         }
-    
+
         return false;
     };
-    
+
 
     useEffect(() => {
         if (checkBingoCompletion()) {
@@ -142,7 +137,7 @@ const Bingo = () => {
         }
         saveBingoGrid()
     }, [bingoGrid]);
-    
+
 
     return (
         <div className="flex flex-col kanit-regular text-white bg-[#282424]">
@@ -158,6 +153,7 @@ const Bingo = () => {
                 <Sidebar isOpen={isOpen} />
                 <div className="flex flex-col w-full mt-8 px-4">
                     <h1 className="text-3xl font-bold text-center">Bingo 2025</h1>
+                    <p>Bingo goals are personal objectives or tasks organized into a 5x5 grid resembling a bingo card. Each cell represents a specific goal, and users mark them as completed. When an entire row, column, or diagonal is completed, it highlights the achievement, similar to a traditional bingo game. It's a fun and visual way to track progress toward goals for a specific period, such as a year.</p>
                     <p className="text-neutral-700">*doble click to mark as completed</p>
                     <div className="grid grid-cols-5 gap-2 mt-6">
                         {bingoGrid.map((cell) => (
@@ -167,19 +163,11 @@ const Bingo = () => {
                                     }`}
                                 onDoubleClick={() => handleMarkComplete(cell.id)}
                             >
-                                {cell.imageUrl ? (
-                                    <img
-                                        src={cell.imageUrl}
-                                        alt="Goal"
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <textarea
-                                        className="w-full h-full bg-transparent border-none  text-white text-center bingo-textarea"
-                                        value={cell.goal}
-                                        onChange={(e) => handleGoalChange(cell.id, e.target.value)}
-                                    />
-                                )}
+                                <textarea
+                                    className="w-full h-full bg-transparent border-none  text-white text-center bingo-textarea"
+                                    value={cell.goal}
+                                    onChange={(e) => handleGoalChange(cell.id, e.target.value)}
+                                />
                                 {cell.completionDate && (
                                     <p className="text-xs text-white -mt-3">
                                         Completed: {cell.completionDate}
