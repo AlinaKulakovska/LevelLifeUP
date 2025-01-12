@@ -18,7 +18,6 @@ const Bingo = () => {
             goal: "",
             completed: false,
             completionDate: null,
-            imageUrl: null,
         }))
     );
 
@@ -153,18 +152,25 @@ const Bingo = () => {
                 <Sidebar isOpen={isOpen} />
                 <div className="flex flex-col w-full mt-8 px-4">
                     <h1 className="text-3xl font-bold text-center">Bingo 2025</h1>
-                    <p>Bingo goals are personal objectives or tasks organized into a 5x5 grid resembling a bingo card. Each cell represents a specific goal, and users mark them as completed. When an entire row, column, or diagonal is completed, it highlights the achievement, similar to a traditional bingo game. It's a fun and visual way to track progress toward goals for a specific period, such as a year.</p>
-                    <p className="text-neutral-700">*doble click to mark as completed</p>
-                    <div className="grid grid-cols-5 gap-2 mt-6">
-                        {bingoGrid.map((cell) => (
+                    <p className="text-neutral-300 leading-4">Bingo goals are personal objectives or tasks organized into a 5x5 grid resembling a bingo card. Each cell represents a specific goal, and users mark them as completed. When an entire row, column, or diagonal is completed, it highlights the achievement, similar to a traditional bingo game. It's a fun and visual way to track progress toward goals for a specific period, such as a year.</p>
+                    <p className="text-neutral-700 text-right">*doble click to mark as completed</p>
+                    <div
+                        className="grid grid-cols-5 gap-2 mt-6 bing-grid overflow-x-auto"
+                        style={{ minWidth: '800px' }} // Ensures at least 5 cells fit in a row
+                    >
+                        {bingoGrid.map((cell, index) => (
                             <div
                                 key={cell.id}
-                                className={`p-4 border min-h-28 rounded ${cell.completed ? "bg-amber-500" : "bg-neutral-700"
+                                className={`p-4 border rounded min-h-28 min-w-[100px] ${cell.completed
+                                        ? "bg-neutral-700"
+                                        : index % 2 === 0
+                                            ? "bg-orange-100 text-black"
+                                            : "bg-orange-200 text-black"
                                     }`}
                                 onDoubleClick={() => handleMarkComplete(cell.id)}
                             >
                                 <textarea
-                                    className="w-full h-full bg-transparent border-none  text-white text-center bingo-textarea"
+                                    className="w-full h-full bg-transparent border-none text-center bingo-textarea"
                                     value={cell.goal}
                                     onChange={(e) => handleGoalChange(cell.id, e.target.value)}
                                 />
@@ -176,6 +182,7 @@ const Bingo = () => {
                             </div>
                         ))}
                     </div>
+
 
                 </div>
             </div>
